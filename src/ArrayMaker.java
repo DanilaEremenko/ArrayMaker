@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.List;
 
 /*Для нахождения наибольльшего подмассива проходим 1 раз циклом for по исходному массиву.
 * Используем 3 дополнительных массива:
@@ -17,13 +18,12 @@ public class ArrayMaker {
 
 
     //Находит наибольший подмассива
-    public static ArrayList<Integer> searchMaxArray(ArrayList<Integer> defaultArray) {
-        ArrayList<Integer> secondPart = new ArrayList<>();//Хранения суммы справа от отрицательного
-        ArrayList<Integer> firstPart = new ArrayList<>();//Хранение суммы слева от отрицательного
-        ArrayList<Integer> maxPart = new ArrayList<>();//Хранение максимальной суммы
-        ArrayList<Integer> minusPart = new ArrayList<>();//Сумма отрицательных
+    public static List<Integer> searchMaxArray(List<Integer> defaultArray) {
+        Pair firstPart = new Pair(new ArrayList(), 0);//Хранение суммы слева от отрицательного
+        Pair secondPart = new Pair(new ArrayList(), 0);//Хранения суммы справа от отрицательного
+        Pair minusPart = new Pair(new ArrayList(), 0);//Сумма отрицательных
+        Pair maxPart = new Pair(new ArrayList(), 0);//Хранение максимальной суммы
         for (int i = 0; i < defaultArray.size(); ) {
-
 
             while (defaultArray.get(i) >= 0 && i < defaultArray.size()) {
                 firstPart.add(defaultArray.get(i));
@@ -49,17 +49,26 @@ public class ArrayMaker {
 
                 }
 
-             if (arrayElementsSum(firstPart) + arrayElementsSum(minusPart) >= 0 && arrayElementsSum(secondPart) + arrayElementsSum(minusPart) >= 0
-                    && arrayElementsSum(maxPart) < arrayElementsSum(firstPart) + arrayElementsSum(secondPart) + arrayElementsSum(minusPart)) {
 
-                if (!maxPart.equals(firstPart))
+            if (firstPart.size() == 0 && secondPart.size() == 0)
+                return minusPart.getMaxMinusDigit();
+            if(maxPart.size()==0&&secondPart.size()==0&&minusPart.size()==0)
+                return firstPart.getArrayList();
+
+            if (firstPart.getSum() + minusPart.getSum() >= 0 && secondPart.getSum() + minusPart.getSum() >= 0
+                    && maxPart.getSum() < firstPart.getSum() + secondPart.getSum() + minusPart.getSum()) {
+
+                if (maxPart.getSum() != firstPart.getSum())
                     maxPart.addAll(firstPart);
+
+
                 maxPart.addAll(minusPart);
                 maxPart.addAll(secondPart);
-                removeTo(firstPart, maxPart);
+                firstPart.removeTo(maxPart);
             } else {
-                removeTo(maxPart, maxArray(firstPart, secondPart));
-                removeTo(firstPart, secondPart);
+                maxPart.removeTo(Pair.max(firstPart, secondPart));
+                firstPart.removeTo(secondPart);
+
             }
 
 
@@ -69,35 +78,10 @@ public class ArrayMaker {
         }
 
 
-        return maxPart;
+        return maxPart.getArrayList();
 
     }
 
-    //Возвращает сумму элементов массива
-    static private int arrayElementsSum(ArrayList<Integer> arrayList) {
-        int sum = 0;
-        for (Integer element : arrayList)
-            sum += element;
-
-        return sum;
-
-    }
-
-
-    //Возвращает больший массив
-    static private ArrayList<Integer> maxArray(ArrayList<Integer> firstArray, ArrayList<Integer> secondArray) {
-        if (arrayElementsSum(firstArray) > arrayElementsSum(secondArray))
-            return firstArray;
-        else
-            return secondArray;
-    }
-
-    //Переносит содержимое одного массива в другой
-    static private void removeTo(ArrayList<Integer> arrayList, ArrayList<Integer> arrayList2) {
-        arrayList.clear();
-        arrayList.addAll(arrayList2);
-
-    }
 
 }
 
